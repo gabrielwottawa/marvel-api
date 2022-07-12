@@ -1,55 +1,42 @@
 ﻿using marvel.Database;
 using marvel.Models;
+using marvel.Request;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace marvel.Repositories
 {
     public class CharacterRepository : IRepository<CharacterModel>
     {
-        private static Dictionary<int, CharacterModel> characters = new Dictionary<int, CharacterModel>();
+        public async Task<IEnumerable<CharacterModel>> GetCharactersByName(string name)
+        {
+            var apiMarvel = new RequestApiMarvel();
+            return await Task.Run(() => apiMarvel.GetCharactersByName(name));
+        }
+
+        public async Task<IEnumerable<CharacterModel>> GetAllCharacters(int orderBy)
+        {
+            var apiMarvel = new RequestApiMarvel();
+            return await Task.Run(() => apiMarvel.GetAllCharacters(orderBy));
+        }
+
+        public async Task<IEnumerable<CharacterModel>> GetFavoritesCharacters()
+        {
+            var requestFavoritesCharacters = new RequestFavoritesCharacters();
+            return await Task.Run(() => requestFavoritesCharacters.GetAllFavoritesCharacters());
+        }
 
         public async Task Add(CharacterModel item)
         {
-            await Task.Run(() => insertDB(item));
+            var charactersWriter = new CharactersWriter();
+            var charactersEntity = new CharactersEntity() { Name = item.Name, DeveloperMarvelId = item.Id };
+            await Task.Run(() => charactersWriter.InsertCharacter(charactersEntity));
         }
 
         public async Task Delete(int id)
         {
-            await Task.Run(() => deleteDB(id));
-        }
-
-        public async Task Edit(CharacterModel item)
-        {
-            await Task.Run(() =>
-            {
-                characters.Remove(item.Id);
-                characters.Add(item.Id, item);
-            });
-        }
-
-        public async Task<CharacterModel> Get(int id)
-        {
-            return await Task.Run(() => characters.GetValueOrDefault(id));
-        }
-
-        public async Task<IEnumerable<CharacterModel>> GetAll()
-        {
-            return await Task.Run(() => characters.Values.ToList());
-        }
-
-        private void insertDB(CharacterModel character)
-        {
             var charactersWriter = new CharactersWriter();
-            var charactersEntity = new CharactersEntity() { Name = character.Name, DeveloperMarvelId = character.Id };
-            charactersWriter.InsertCharacter(charactersEntity);
-        }
-
-        private void deleteDB(int id)
-        {
-            var charactersWriter = new CharactersWriter();
-            charactersWriter.DeleteCharacter(id);
+            await Task.Run(() => charactersWriter.DeleteCharacter(id));
         }
     }
 }

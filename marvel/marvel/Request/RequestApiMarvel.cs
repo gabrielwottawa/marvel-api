@@ -1,27 +1,26 @@
 ﻿using marvel.Models;
 using Marvel.Api;
 using Marvel.Api.Filters;
-using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace marvel.Controllers
+namespace marvel.Request
 {
-    public class MarvelController : Controller
+    public class RequestApiMarvel
     {
         private const string APIKEY = "046e7dea92107587b0325bf1148f792b";
         private const string PRIVATEKEY = "b96ff2b51fe33d6f006731902d0afd9bab05291b";
         private MarvelRestClient restClient;
 
-        public MarvelController()
+        public RequestApiMarvel()
         {
             restClient = new MarvelRestClient(APIKEY, PRIVATEKEY);
         }
 
-        public JsonResult GetAllCharacters(int orderBy)
+        public List<CharacterModel> GetAllCharacters(int orderBy)
         {
             var filter = new CharacterRequestFilter();
-            filter.Limit = 10;
+            filter.Limit = 100;
 
             filter.OrderBy(Extensions.GetOrderResult(orderBy));
 
@@ -30,21 +29,24 @@ namespace marvel.Controllers
             var results = restClient.FindCharacters(filter).Data.Results;
 
             listCharacter = results.Select(res =>
-                        new CharacterModel { Id = res.Id, 
-                                             Name = res.Name, 
-                                             Description = res.Description, 
-                                             Modified = res.Modified, 
-                                             UrlDetails = res.Urls.Where(r => r.Type.ToLower() == "detail").Select(r => r.URL).ToList() }).ToList();
+                        new CharacterModel
+                        {
+                            Id = res.Id,
+                            Name = res.Name,
+                            Description = res.Description,
+                            Modified = res.Modified,
+                            UrlDetails = res.Urls.Where(r => r.Type.ToLower() == "detail").Select(r => r.URL).ToList(),
+                            Series = new List<SeriesModel>()
+                        }).ToList();
 
-            return Json(listCharacter);
+            return listCharacter;
         }
 
-        public JsonResult GetCharactersById(string name)
+        public List<CharacterModel> GetCharactersByName(string name)
         {
             var listCharacter = new List<CharacterModel>();
 
             var filter = new CharacterRequestFilter();
-            filter.Offset = 0;
             filter.Name = name;
 
             var resultsCharacters = restClient.FindCharacters(filter).Data.Results;
@@ -60,7 +62,7 @@ namespace marvel.Controllers
                             Series = getSeriesByCharacter(res.Id)
                         }).ToList();
 
-            return Json(listCharacter);
+            return listCharacter;
         }
 
         private List<SeriesModel> getSeriesByCharacter(int id)
@@ -69,7 +71,6 @@ namespace marvel.Controllers
 
             var filter = new SeriesRequestFilter();
             filter.OrderBy(Extensions.GetOrderResult(0));
-            filter.Offset = 0;
             filter.Limit = 50;
 
             var resultsSeries = restClient.FindCharacterSeries(id.ToString(), filter).Data.Results;

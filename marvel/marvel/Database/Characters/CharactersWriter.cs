@@ -16,7 +16,7 @@ namespace marvel.Database
         public void InsertCharacter(CharactersEntity charactersEntity)
         {
             connection.Open();
-            var query = "INSERT INTO Characters (Name, DeveloperMarvelId) VALUES (@Name, @DeveloperMarvelId)";
+            var query = "INSERT INTO FavoritesCharacters (Name, DeveloperMarvelId) VALUES (@Name, @DeveloperMarvelId)";
             var param = new DynamicParameters();
             param.Add("@Name", charactersEntity.Name);
             param.Add("@DeveloperMarvelId", charactersEntity.DeveloperMarvelId);
@@ -26,7 +26,7 @@ namespace marvel.Database
         public void DeleteCharacter(int id)
         {
             connection.Open();
-            var query = "DELETE Characters WHERE Id = @Id";
+            var query = "DELETE FavoritesCharacters WHERE Id = @Id";
             var param = new DynamicParameters();
             param.Add("@Id", id);
             connection.Execute(query, param);

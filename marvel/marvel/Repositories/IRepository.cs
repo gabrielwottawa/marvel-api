@@ -5,10 +5,10 @@ namespace marvel.Repositories
 {
     public interface IRepository<T>
     {
-        Task<IEnumerable<T>> GetAll();
-        Task<T> Get(int id);
+        Task<IEnumerable<T>> GetAllCharacters(int orderBy);
+        Task<IEnumerable<T>> GetCharactersByName(string name);
+        Task<IEnumerable<T>> GetFavoritesCharacters();
         Task Add(T item);
-        Task Edit(T item);
         Task Delete(int id);
     }
 }

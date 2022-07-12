@@ -18,6 +18,18 @@ namespace marvel.Controllers
             this.repository = repository;
         }
 
+        [Route("/v1/public/characters")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllCharacters(int orderBy = 0) => Ok(await repository.GetAllCharacters(orderBy));
+
+        [Route("/v1/public/character-by-name")]
+        [HttpGet]
+        public async Task<IActionResult> GetCharactersByName(string name) => Ok(await repository.GetCharactersByName(name));
+
+        [Route("/v1/public/favorite-characters")]
+        [HttpGet]
+        public async Task<IActionResult> GetFavoriteCharacters() => Ok(await repository.GetFavoritesCharacters());
+
         [Route("/v1/public/insert-character")]
         [HttpPost]
         public async Task<IActionResult> Post(InsertCharacterCommand command)
@@ -27,7 +39,7 @@ namespace marvel.Controllers
         }
 
         [Route("/v1/public/delete-character")]
-        [HttpDelete("{id}")]
+        [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
             var obj = new DeleteCharacterCommand { Id = id };

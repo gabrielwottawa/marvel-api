@@ -15,11 +15,11 @@ namespace marvel.Database.Characters
             connection = dbConnection.GetConnection();
         }
 
-        public List<string> SelectCharacter()
+        public List<CharactersEntity> SelectCharacter()
         {
             connection.Open();
-            var query = "SELECT Name, DeveloperMarvelId FROM Characters";
-            var result = connection.Query<string>(query);
+            var query = "SELECT Name, DeveloperMarvelId FROM FavoritesCharacters";
+            var result = connection.Query<CharactersEntity>(query);
             return result.ToList();
         }
     }
